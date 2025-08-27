@@ -19,7 +19,7 @@ Este documento contém todas as instruções necessárias para executar e testar
 ### 1. **Clone o Repositório**
 
 ```bash
-git clone https://github.com/seu-usuario/prosefa-challenge.git
+git clone  https://github.com/blackbomb404/teste-backend-statement-labs/pull/new/teste-leonel-rocha-nascimento
 cd prosefa-challenge
 ```
 
@@ -38,19 +38,15 @@ mvn spring-boot:run
 
 ### 4. **Verificar se Está Funcionando**
 
-A aplicação estará disponível em: **http://localhost:8080**
-
+A aplicação estará disponível em: **http://localhost:8080
 #### Endpoints de Verificação:
 
-- **Health Check**: `GET http://localhost:8080/actuator/health`
-- **H2 Console** (se usando H2): `http://localhost:8080/h2-console`
-- **Swagger UI** (se configurado): `http://localhost:8080/swagger-ui.html`
+- **H2 Console**: `http://localhost:8080/h2-console`
+- **Swagger UI**: `http://localhost:8080/swagger-ui/index.html`
 
 ---
 
 ## 📱 Exemplos de Chamadas da API
-
-### **Base URL**: `http://localhost:8080/api`
 
 ---
 
@@ -60,7 +56,7 @@ A aplicação estará disponível em: **http://localhost:8080**
 
 ```bash
 # cURL
-curl -X POST http://localhost:8080/api/empresas \
+curl -X POST http://localhost:8080/api/v1/empresas \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "Empresa ABC Lda",
@@ -73,47 +69,12 @@ curl -X POST http://localhost:8080/api/empresas \
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "nome": "Empresa ABC Lda",
-  "nif": "123456789",
-  "tipo": "FABRICANTE",
-  "status": "ATIVA",
-  "dataRegistro": "2025-08-27T14:30:00"
-}
-```
-
-### **1.2 Listar Empresas**
-
-```bash
-# cURL
-curl -X GET http://localhost:8080/api/empresas
-```
-
-### **1.3 Buscar Empresa por ID**
-
-```bash
-# cURL
-curl -X GET http://localhost:8080/api/empresas/550e8400-e29b-41d4-a716-446655440000
-```
-
-### **1.4 Verificar Status de Bloqueio**
-
-```bash
-# cURL
-curl -X GET http://localhost:8080/api/empresas/550e8400-e29b-41d4-a716-446655440000/status-bloqueio
-```
-
-**Resposta:**
-
-```json
-{
-  "empresaId": "550e8400-e29b-41d4-a716-446655440000",
-  "bloqueada": false,
-  "selosVencidos": 0,
-  "totalSelosNaoValidados": 2,
-  "dataSeloMaisAntigo": null,
-  "diasLimite": 30,
-  "mensagem": "Empresa liberada para solicitar selos"
+	"id": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+	"nome": "Empresa ABC Lda",
+	"nif": "123456789",
+	"tipo": "FABRICANTE",
+	"status": "ATIVA",
+	"dataRegistro": "2025-08-27T19:18:23.679250426"
 }
 ```
 
@@ -125,12 +86,11 @@ curl -X GET http://localhost:8080/api/empresas/550e8400-e29b-41d4-a716-446655440
 
 ```bash
 # cURL
-curl -X POST http://localhost:8080/api/selos/solicitar \
+curl -X POST http://localhost:8080/api/v1/solicitacoes \
   -H "Content-Type: application/json" \
   -d '{
-    "empresaId": "550e8400-e29b-41d4-a716-446655440000",
+    "idEmpresa": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
     "produto": "Whisky Premium 750ml",
-    "quantidade": 100
   }'
 ```
 
@@ -138,143 +98,232 @@ curl -X POST http://localhost:8080/api/selos/solicitar \
 
 ```json
 {
-  "id": "123e4567-e89b-12d3-a456-426614174000",
-  "empresaId": "550e8400-e29b-41d4-a716-446655440000",
-  "nomeEmpresa": "Empresa ABC Lda",
-  "produto": "Whisky Premium 750ml",
-  "quantidade": 100,
-  "status": "PENDENTE",
-  "dataSolicitacao": "2025-08-27T14:35:00",
-  "dataProcessamento": null
+	"idSolicitacao": "04880841-6ed0-41ed-9d3d-b10165bf37ce",
+	"idEmpresa": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+	"produto": "Whisky Premium 750ml",
+	"status": "PENDENTE",
+	"dataSolicitacao": "2025-08-27T19:23:52.348453491"
 }
-```
-
-### **2.2 Listar Solicitações**
-
-```bash
-# cURL
-curl -X GET http://localhost:8080/api/selos/solicitacoes
 ```
 
 ---
 
 ## 3. 🏷️ Emissão e Validação de Selos
 
-### **3.1 Emitir Selos (Aprovar Solicitação)**
+### **3.1 Emitir Selo (Aprovar Solicitação)**
 
 ```bash
 # cURL
-curl -X POST http://localhost:8080/api/selos/solicitacoes/123e4567-e89b-12d3-a456-426614174000/emitir
+curl -X 'POST' \
+	'http://localhost:8080/api/v1/selos' \
+	-H 'accept: */*' \
+	-H 'Content-Type: application/json' \
+	-d '{
+		"idSolicitacao": "04880841-6ed0-41ed-9d3d-b10165bf37ce"
+}'
 ```
 
-**Resposta (200 OK):**
+**Resposta (201 Created):**
 
 ```json
-[
-  {
-    "id": "111e1111-e11b-11d3-a111-111111111111",
-    "codigo": "PROSEFA-2025-000001",
-    "empresaId": "550e8400-e29b-41d4-a716-446655440000",
-    "nomeEmpresa": "Empresa ABC Lda",
-    "produto": "Whisky Premium 750ml",
-    "solicitacaoId": "123e4567-e89b-12d3-a456-426614174000",
-    "dataEmissao": "2025-08-27T14:40:00",
-    "estado": "EMITIDO"
-  },
-  {
-    "id": "222e2222-e22b-22d3-a222-222222222222",
-    "codigo": "PROSEFA-2025-000002",
-    "empresaId": "550e8400-e29b-41d4-a716-446655440000",
-    "nomeEmpresa": "Empresa ABC Lda",
-    "produto": "Whisky Premium 750ml",
-    "solicitacaoId": "123e4567-e89b-12d3-a456-426614174000",
-    "dataEmissao": "2025-08-27T14:40:00",
-    "estado": "EMITIDO"
-  }
-]
+{
+	"id": "d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1",
+	"codigo": "PROSEFA-2025-000001",
+	"empresaId": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+	"nomeEmpresa": "Leonel Lda",
+	"produto": "Whisky Premium 750ml",
+	"dataEmissao": "2025-08-27T19:25:51.45987368",
+	"estado": "EMITIDO"
+}
 ```
 
 ### **3.2 Validar Selo Individual**
 
 ```bash
 # cURL
-curl -X PUT http://localhost:8080/api/selos/111e1111-e11b-11d3-a111-111111111111/validar
+curl -X 'PUT' \
+	'http://localhost:8080/api/v1/selos/{id}?id=d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1' \
+	-H 'accept: */*'
 ```
 
 **Resposta (200 OK):**
 
 ```json
 {
-  "id": "111e1111-e11b-11d3-a111-111111111111",
-  "codigo": "PROSEFA-2025-000001",
-  "empresaId": "550e8400-e29b-41d4-a716-446655440000",
-  "nomeEmpresa": "Empresa ABC Lda",
-  "produto": "Whisky Premium 750ml",
-  "solicitacaoId": "123e4567-e89b-12d3-a456-426614174000",
-  "dataEmissao": "2025-08-27T14:40:00",
-  "estado": "VALIDADO"
+	"id": "d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1",
+	"codigo": "PROSEFA-2025-000001",
+	"empresaId": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+	"nomeEmpresa": "Leonel Lda",
+	"produto": "string",
+	"dataEmissao": "2025-08-27T19:25:51.459874",
+	"estado": "VALIDADO"
 }
 ```
 
-### **3.3 Buscar Selo por ID**
+### **3.3 Listar Selos por Empresa** (com paginação)
 
 ```bash
 # cURL
-curl -X GET http://localhost:8080/api/selos/111e1111-e11b-11d3-a111-111111111111
+curl -X 'GET' \
+	'http://localhost:8080/api/v1/selos/{idEmpresa}?idEmpresa=f4ffb79a-af07-490e-8fa3-8eb177bd326d&pageNumber=0&pageCapacity=5' \
+	-H 'accept: */*'{
+	"id": "d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1",
+	"codigo": "PROSEFA-2025-000001",
+	"empresaId": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+	"nomeEmpresa": "Leonel Lda",
+	"produto": "string",
+	"dataEmissao": "2025-08-27T19:25:51.459874",
+	"estado": "VALIDADO"
+}
 ```
 
-### **3.4 Listar Selos por Empresa**
+**Resposta (200 OK):**
 
-```bash
-# cURL
-curl -X GET http://localhost:8080/api/selos/empresa/550e8400-e29b-41d4-a716-446655440000
+```json
+{
+	"content": [ 
+		{
+			 "id": "d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1",
+			 "codigo": "PROSEFA-2025-000001",
+			 "empresaId": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+			 "nomeEmpresa": "Leonel Lda",
+			 "produto": "string",
+			 "dataEmissao": "2025-08-27T19:25:51.459874",
+			 "estado": "VALIDADO"
+		}
+	],
+	"pageable": {
+		"pageNumber": 0,
+		"pageSize": 5,
+		"sort": {
+			"sorted": false,
+			"empty": true,
+			"unsorted": true
+		},
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+		},
+		"first": true,
+		"last": true,
+		"size": 5,
+		"number": 0,
+		"sort": {
+			"sorted": false,
+			"empty": true,
+			"unsorted": true
+		},
+		"numberOfElements": 1,
+		"empty": false
+	}
 ```
 
 ---
 
 ## 4. 📊 Logs de Auditoria
 
-### **4.1 Listar Todos os Logs**
+### **4.1 Listar Todos os Logs** (com paginação)
 
 ```bash
 # cURL
-curl -X GET http://localhost:8080/api/auditoria
+curl -X 'GET' \
+	'http://localhost:8080/api/v1/logs?pageNumber=0&pageCapacity=5' \
+	-H 'accept: */*'
 ```
 
-### **4.2 Filtrar Logs por Entidade**
-
-```bash
-# cURL
-curl -X GET "http://localhost:8080/api/auditoria?entidade=SeloFiscal"
-```
-
-### **4.3 Filtrar Logs por Ação**
-
-```bash
-# cURL
-curl -X GET "http://localhost:8080/api/auditoria?acao=SELO_VALIDADO"
-```
-
-### **4.4 Filtrar Logs por Período**
-
-```bash
-# cURL
-curl -X GET "http://localhost:8080/api/auditoria?inicio=2025-08-27T00:00:00&fim=2025-08-27T23:59:59"
-```
-
-**Resposta:**
+**Resposta (200 OK):**
 
 ```json
-[
-  {
-    "id": "333e3333-e33b-33d3-a333-333333333333",
-    "entidade": "SeloFiscal",
-    "acao": "SELO_VALIDADO",
-    "usuario": "admin",
-    "dataHora": "2025-08-27T14:45:00",
-    "detalhes": "{\"seloId\":\"111e1111-e11b-11d3-a111-111111111111\",\"codigo\":\"PROSEFA-2025-000001\",\"produto\":\"Whisky Premium 750ml\"}"
-  }
-]
+{
+	"content": [
+		{
+			"id": "809c40de-a7ad-499a-b3af-bee0e5fcf05f",
+			"entidade": "Empresa",
+			"accao": "EMPRESA_CRIADA",
+			"usuario": "sistema",
+			"dataHora": "2025-08-27T19:15:15.646217",
+			"detalhes": {
+				"nomeEmpresa": "string",
+				"idEmpresa": "fbe1e318-638c-4ed3-94c9-a18443d07685",
+				"tipo": "FABRICANTE",
+				"nif": "string"
+			}
+		}, {
+			"id": "d7e24742-dce4-46f9-a5e6-9fcadbee1aad",
+			"entidade": "Empresa",
+			"accao": "EMPRESA_CRIADA",
+			"usuario": "sistema",
+			"dataHora": "2025-08-27T19:18:23.680077",
+			"detalhes": {
+				"nomeEmpresa": "Leonel Lda",
+				"idEmpresa": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+				"tipo": "FABRICANTE",
+				"nif": "stringa"
+			}
+		}, {
+			"id": "e0b23e48-5d8c-41e6-820a-015e7702730d",
+			"entidade": "SolicitacaoSeloFiscal",
+			"accao": "SOLICITACAO_CRIADA",
+			"usuario": "sistema",
+			"dataHora": "2025-08-27T19:23:52.351229",
+			"detalhes": {
+				"nomeEmpresa": "Leonel Lda",
+				"idEmpresa": "f4ffb79a-af07-490e-8fa3-8eb177bd326d",
+				"dataSolicitacao": "2025-08-27T19:23:52.348453491",
+				"produto": "string"
+			}
+		}, {
+			"id": "e115f187-ed80-4f22-bd45-3f6d0f9cc3e0",
+			"entidade": "SeloFiscal",
+			"accao": "SELO_EMITIDO",
+			"usuario": "sistema",
+			"dataHora": "2025-08-27T19:25:51.466289",
+			"detalhes": {
+				"produto": "string",
+				"nomeEmpresa": "Leonel Lda",
+				"idSolicitacao": "04880841-6ed0-41ed-9d3d-b10165bf37ce",
+				"codigoSelo": "PROSEFA-2025-000001",
+				"idSelo": "d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1"
+			}
+		}, {
+			"id": "161f46a7-6c99-4319-9eb3-5424091410dd",
+			"entidade": "SeloFiscal",
+			"accao": "SELO_VALIDADO",
+			"usuario": "sistema",
+			"dataHora": "2025-08-27T19:30:21.823758",
+			"detalhes": {
+				"idSelo": "d94b0f73-bc2f-4fb0-8635-93bdfee1a4e1",
+				"nomeEmpresa": "Leonel Lda",
+				"produto": "string"
+			}
+		}
+	],
+	"pageable": {
+		"pageNumber": 0,
+		"pageSize": 5,
+		"sort": {
+			"sorted": false,
+			"empty": true,
+			"unsorted": true
+		},
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalElements": 5,
+	"totalPages": 1,
+	"first": true,
+	"size": 5,
+	"number": 0,
+	"sort": {
+		"sorted": false,
+		"empty": true,
+		"unsorted": true
+	},
+	"numberOfElements": 5,
+	"empty": false
+}
 ```
 
 ---
